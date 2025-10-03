@@ -21,6 +21,44 @@
 <h1>Моё PWA</h1>
 <button id="showTime">Показать время</button>
 <p id="timeDisplay"></p>
+
+<!-- Кнопка установки PWA (изначально скрыта) -->
+<button id="installButton" style="display: none; margin-top: 20px; padding: 10px 16px; background: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer;">
+    Установить приложение
+</button>
+
 <script src="app.js"></script>
+
+<!-- Логика установки PWA -->
+<script>
+    let deferredPrompt;
+
+    window.addEventListener('beforeinstallprompt', (e) => {
+        // Отменяем автоматическое появление стандартного баннера
+        e.preventDefault();
+        // Сохраняем событие для последующего запуска
+        deferredPrompt = e;
+        // Показываем нашу кнопку
+        document.getElementById('installButton').style.display = 'inline-block';
+    });
+
+    document.getElementById('installButton').addEventListener('click', () => {
+        if (deferredPrompt) {
+            // Запускаем установку
+            deferredPrompt.prompt();
+            // Ждём выбор пользователя
+            deferredPrompt.userChoice.then((choiceResult) => {
+                if (choiceResult.outcome === 'accepted') {
+                    console.log('Пользователь установил PWA');
+                } else {
+                    console.log('Пользователь отменил установку');
+                }
+                // Скрываем кнопку и сбрасываем событие
+                document.getElementById('installButton').style.display = 'none';
+                deferredPrompt = null;
+            });
+        }
+    });
+</script>
 </body>
 </html>
